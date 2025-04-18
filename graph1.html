@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>国际贸易动态柱状图</title>
+    <!-- 确保加载最新版ECharts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.2/echarts.min.js"></script>
+    <style>
+        #main {
+            width: 1000px;
+            height: 600px;  /* 必须明确指定容器尺寸 */
+            margin: 20px auto;
+            border: 1px solid #ddd;  /* 添加边框确认容器可见 */
+        }
+    </style>
+</head>
+<body>
+    <!-- 确保容器在script之前声明 -->
+    <div id="main"></div>
+
+<script>
+// 修复后的数据格式
+const rawData = {
+    years: [2018, 2019, 2020, 2021, 2022, 2023, 2024],
+    regions: [
+        { name: '美国', data: [13.7,11.8,11.7,12.5,12.01,11.17,11.11], flag: '🇺🇸' },
+        { name: '欧盟', data: [14.8,15.4,13.7,13.5,13.42,13.45,13.66], flag: '🇪🇺' },
+        { name: '东南亚国家联盟', data: [12.7,14,15,14.5,15.49,15.8,15.88], flag: '🌏' },
+        { name: '日本', data: [7.1,6.9,7.6,6.1,5.66,5.36,5], flag: '🇯🇵' },
+        { name: '韩国', data: [6.8,6.2,7.5,6.0,5.73,5.23,5.32], flag: '🇰🇷' },
+        { name: '中国香港', data: [6.7,6.3,6.9,6.0,5.05,4.85,5.03], flag: '🇭🇰' },
+        { name: '中国台湾', data: [4.9,5,6.6,5.4,5.66,4.51,4.75], flag: '🇨🇳' },
+        { name: '澳大利亚', data: [3.3,3.3,4.8,3.8,4.47,3.86,3.43], flag: '🇦🇺' }
+    ]
+};
+
+// 确保DOM加载完成后执行
+document.addEventListener('DOMContentLoaded', function() {
+    const chart = echarts.init(document.getElementById('main'));
+    let currentYearIndex = 0;
+
+    const option = {
+        grid: { top: 60, bottom: 30, left: 150, right: 80 },
+        xAxis: {
+            type: 'value',
+            axisLabel: { formatter: '{value}%' }
+        },
+        yAxis: {
+            type: 'category',
+            inverse: true,
+            axisLabel: {
+                formatter: (params) => {
+                    const region = rawData.regions.find(r => r.name === params);
+                    return `${params} ${region.flag}`;
+                },
+                rich: { flag: { fontSize: 24 } }
+            },
+            data: [] // 初始化空数据
+        },
+        series: [{
+            type: 'bar',
+            realtimeSort: true,
+            label: {
+                show: true,
+                position: 'right',
+                formatter: '{c}%'
+            }
+        }]
+    };
+
+    // 初始化图表配置
+    chart.setOption(option);
+
+    // 数据更新函数
+    function updateChart() {
+        const year = rawData.years[currentYearIndex];
+        const sourceData = rawData.regions.map(region => ({
+            name: region.name,
+            value: region.data[currentYearIndex]
+        })).sort((a, b) => b.value - a.value);
+
+        chart.setOption({
+            yAxis: { data: sourceData.map(item => item.name) },
+            series: [{
+                data: sourceData,
+                itemStyle: {
+                    color: function(params) {
+                        // 自定义颜色逻辑
+                        const colors = {
+                            '美国': '#B22234', '欧盟': '#003399', 
+                            '东南亚国家联盟': '#FF6600', '日本': '#BC002D',
+                            '韩国': '#000000', '中国香港': '#DE2910',
+                            '中国台湾': '#000099', '澳大利亚': '#00008B'
+                        };
+                        return colors[params.name] || '#5470C6';
+                    }
+                }
+            }],
+            title: { 
+                text: `${year}年国际贸易数据${year === 2020 ? ' (英国脱欧)' : ''}`,
+                left: 'center' 
+            }
+        });
+    }
+
+    // 自动播放
+    setInterval(() => {
+        currentYearIndex = (currentYearIndex + 1) % rawData.years.length;
+        updateChart();
+    }, 2000);
+
+    // 首次渲染
+    updateChart();
+});
+</script>
+</body>
+</html>
