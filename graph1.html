@@ -84,13 +84,13 @@ document.addEventListener('DOMContentLoaded', function() {
             series: [{
                 data: sourceData,
                 itemStyle: {
-                    color: function(params) {
+                color: function(params) {
                         // 自定义颜色逻辑
                         const colors = {
-                            '美国': '#A2D2E7', '欧盟': '#F36569', 
-                            '东南亚国家联盟': '#6FD3A8', '日本': '#50AA4B',
-                            '韩国': '#F36569', '中国香港': '#CDB6DA',
-                            '中国台湾': '#9A7FBD', '澳大利亚': '#DBA9A8'
+                            '美国': '#6280a5', '欧盟': '#56648a', 
+                            '东南亚国家联盟': '#ca9a96', '日本': '#9d7e95',
+                            '韩国': '#e3b9aa', '中国香港': '#8ca5c0',
+                            '中国台湾': '#938ba0', '澳大利亚': '#516f86'
                         };
                         return colors[params.name] || '#5470C6';
                     }
